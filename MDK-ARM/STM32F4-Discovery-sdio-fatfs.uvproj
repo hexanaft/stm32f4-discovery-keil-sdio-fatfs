@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>stm32f4_blink</TargetName>
+      <TargetName>stm32f4_sdio_fatfs</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>

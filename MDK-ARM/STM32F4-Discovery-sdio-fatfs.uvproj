@@ -516,6 +516,11 @@
               <FileType>1</FileType>
               <FilePath>..\fatfs\ff.c</FilePath>
             </File>
+            <File>
+              <FileName>ff_debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\fatfs\ff_debug.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

@@ -190,5 +190,23 @@ void OTG_FS_IRQHandler(void)
 // 	SD_ProcessDMAIRQ();
 // }
 
+#include "stm32f4_discovery_sdio_sd.h"
+#include "discoveryf4utils.h"
+
+//******************************************************************************
+void SDIO_IRQHandler(void)
+{
+	//printf("SD_ProcessIRQSrc!\n");
+	STM_EVAL_LEDToggle(LED_GREEN);
+	SD_ProcessIRQSrc();
+}
+void SD_SDIO_DMA_IRQHANDLER(void)
+{
+	//printf("SD_ProcessDMAIRQ!\n");
+	STM_EVAL_LEDToggle(LED_BLUE);
+	SD_ProcessDMAIRQ();
+}
+//******************************************************************************
+
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

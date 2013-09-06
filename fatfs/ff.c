@@ -2058,7 +2058,7 @@ BYTE check_fs (	/* 0:FAT-VBR, 1:Any BR but not FAT, 2:Not a BR, 3:Disk error */
 
 
 
-
+#include <stdio.h>
 /*-----------------------------------------------------------------------*/
 /* Check if the file system object is valid or not                       */
 /*-----------------------------------------------------------------------*/
@@ -2138,7 +2138,8 @@ FRESULT chk_mounted (	/* FR_OK(0): successful, !=0: any error occurred */
 		}
 	}
 	if (fmt == 3) return FR_DISK_ERR;
-	if (fmt) return FR_NO_FILESYSTEM;		/* No FAT volume is found */
+	if (fmt){printf("No FAT volume is found\n"); return FR_NO_FILESYSTEM;}		/* No FAT volume is found */
+	
 
 	/* An FAT volume is found. Following code initializes the file system object */
 

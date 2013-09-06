@@ -159,7 +159,7 @@
 #define PLL_P      2
 
 /* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
-#define PLL_Q      6
+#define PLL_Q      8
 
 /******************************************************************************/
 

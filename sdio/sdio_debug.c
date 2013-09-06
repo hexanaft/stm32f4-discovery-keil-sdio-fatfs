@@ -26,22 +26,93 @@ void print_RCC_Clocks(void)
 	printf("PCLK2 = %u\n", RCC_Clocks.PCLK2_Frequency);
 }
 
-#define PRINT_ROW	32	/* строка */
-#define PRINT_COL	16	/* столбец */
-#define PRINT_BUF	PRINT_ROW * PRINT_COL	/* буфер */
+#define PRINT_ROW		32	/* строка */
+#define PRINT_COL		16	/* столбец */
+#define PRINT_BUF_SIZE	PRINT_ROW * PRINT_COL	/* размер буфера */
 
-void print_all_SD( uint32_t size )
+
+//=============================================================================
+// 00	NUL	^@	Пусто (конец строки)
+// 01	SOH	^A	Начало заголовка
+// 02	STX	^B	Начало текста
+// 03	EOT	^C	Конец текста
+// 04	ENQ	^D	Конец передачи
+// 06	ACK	^F	Подтверждение
+// 07	BEL	^G	Звонок
+// 08	BS	^H	Шаг назад
+// 09	HT	^I	Горизонтальная табуляция
+// 0A	LF	^J	Перевод строки
+// 0B	VT	^K	Вертикальная табуляция
+// 0C	FF	^L	Перевод страницы
+// 0D	CR	^M	Возврат каретки
+// 0E	SO	^N	Выдвинуть
+// 0F	SI	^O	Сдвинуть
+// 10	DLE	^P	Оставить канал данных
+// 11	DC1/XON	^Q	Управление устройством 1
+// 12	DC2	^R	Управление устройством 2
+// 13	DC3/XOFF	^S	Управление устройством 3
+// 14	DC4	^T	Управление устройством 4
+// 15	NAK	^U	Отрицательное подтверждение
+// 16	SYN	^V	Синхронизация
+// 17	ETB	^W	Конец блока передачи
+// 18	CAN	^X	Отмена
+// 19	EM	^Y	Конец носителя
+// 1A	SUB	^Z	Замена
+// 1B	ESC	^[	Escape
+// 1C	FS	^\	Разделитель файлов
+// 1D	GS	^]	Разделитель групп
+// 1E	RS	^^	Разделитель записей
+// 1F	US	^_	Разделитель полей
+// 20	SP	 	Пробел
+// 7F	DEL	^?	Удаление
+//=============================================================================
+
+void print_adr_HEX_str( const uint32_t ReadAddr, const uint8_t * Buff )
 {
 	uint32_t i = 0;
 	uint32_t j = 0;
-	uint32_t k = 0;
+	uint16_t adr = 0;
+	uint8_t Byte = Buff[0];
+	
+	for(i=0;i<PRINT_ROW;++i)
+	{
+		printf("\n");		
+		// print adr
+		printf("0x%08X | ", ReadAddr + i*PRINT_COL );
+		
+		// print HEX
+		for(j=0;j<PRINT_COL;++j)
+		{
+			Byte = Buff[adr++];
+			printf("%02X ",Byte);
+		}
+		
+		printf("| ");
+		
+		adr -= PRINT_COL;
+		// print STR
+		for(j=0;j<PRINT_COL;++j)
+		{
+			Byte = Buff[adr++];
+			if(Byte > 0x20)
+				printf("%c",Byte);
+			else
+				printf("%c",'.');
+		}
+		printf(" |");
+	}
+}
+
+void print_all_SD( uint32_t size )
+{
+	uint32_t ReadAddr = 0;
 	SD_Error SDError;
-	uint8_t Buff[PRINT_BUF];
+	uint8_t Buff[PRINT_BUF_SIZE];
 	
 	while(size--)
 	{
 		//printf("k = %i\n",k);
-		SDError = SD_ReadBlock(Buff, k, PRINT_BUF);
+		SDError = SD_ReadBlock(Buff, ReadAddr, PRINT_BUF_SIZE);
 		if(SDError != SD_OK )
 			SD_print_error( SDError );
 		
@@ -49,26 +120,8 @@ void print_all_SD( uint32_t size )
 		while(SD_GetStatus() != SD_TRANSFER_OK);
 		#endif
 		
-		for(i=0;i<PRINT_ROW;++i)
-		{
-			printf("0x%08X |",k*PRINT_BUF + i*PRINT_COL );
-			
-			// print HEX
-			for(j=0;j<PRINT_COL;++j)
-			{
-				printf("%02X ",Buff[i*j]);
-			}
-			
-			// print STR
-			for(j=0;j<PRINT_COL;++j)
-			{
-				printf("%c",Buff[i*j]);
-			}
-			if(i==(PRINT_COL-1))printf("k = %i",k);
-			printf("|\n");
-		}
-		
-		k++;
+		print_adr_HEX_str( ReadAddr*PRINT_BUF_SIZE, Buff );
+		printf(" ReadAddr = %i",ReadAddr++);
 	}
 }
 

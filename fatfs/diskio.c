@@ -78,7 +78,6 @@ DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive nmuber (0..) */
 )
 {
-	
 	if( pdrv == SD_DISK_PDRV )
 	{
 		/*
@@ -99,7 +98,7 @@ DSTATUS disk_status (
 			return RES_ERROR;
 		}
 		*/
-
+		
 		return SDInitialized ? RES_OK : STA_NOINIT;
 	}
 	return STA_NOINIT;
@@ -111,6 +110,7 @@ DSTATUS disk_status (
 /* Read Sector(s)                                                        */
 /*-----------------------------------------------------------------------*/
 #define BLOCK_SIZE 512
+
 DRESULT disk_read (
 	BYTE pdrv,		/* Physical drive nmuber (0..) */
 	BYTE *buff,		/* Data buffer to store read data */
@@ -118,118 +118,34 @@ DRESULT disk_read (
 	BYTE count		/* Number of sectors to read (1..128) */
 )
 {
-	  SDTransferState state;
-//  DRESULT res = RES_OK;
-  
-
-
-//  STM_EVAL_LEDOn ( LED_ORANGE );
-
-  //SD_ReadMultiBlocksFIXED ( buff, sector, 512, 1 );
-  SD_ReadBlock(buff, sector, 512);
- // SD_WaitReadOperation ( );
-  
-//   while ( 1 )
-//   {
-//     state = SD_GetStatus ( );
-//     if ( state == SD_TRANSFER_OK )
-//       break;
-//   } // while
-
-//  STM_EVAL_LEDOff ( LED_ORANGE );
-
-  return RES_OK;
+//	SDTransferState SD_TransferState;
+	DRESULT dresult = RES_OK;
+	SD_Error SDError;
 	
-	
-// SD_Error Status;
-//  
-//     printf("disk_read %d %p %10d %d\n",pdrv,buff,sector,count);
-//  
-//     if (SD_Detect() != SD_PRESENT)
-//         return(RES_NOTRDY);
-//  
-//     if ((DWORD)buff & 3) // DMA Alignment failure, do single up to aligned buffer
-//     {
-//         DRESULT res = RES_OK;
-//         DWORD scratch[BLOCK_SIZE / 4]; // Alignment assured, you'll need a sufficiently big stack
-//          
-//         while(count--)
-//         {
-//             res = disk_read(pdrv, (void *)scratch, sector++, 1);
-//  
-//             if (res != RES_OK)
-// 			{
-//                 break;
-// 			}
-//             memcpy(buff, scratch, BLOCK_SIZE);
-//  
-//             buff += BLOCK_SIZE;
-//         }
-//          
-//         return(res);
-//     }
-//      
-//   Status = SD_ReadMultiBlocksFIXED(buff, sector, BLOCK_SIZE, count); // 4GB Compliant
-//  
-//     if (Status == SD_OK)
-//     {
-//         SDTransferState State;
-//          
-//         Status = SD_WaitReadOperation(); // Check if the Transfer is finished
-//  		SD_print_error(Status);
-// 		
-//         while((State = SD_GetStatus()) == SD_TRANSFER_BUSY); // BUSY, OK (DONE), ERROR (FAIL)
-//          
-//         if (State == SD_TRANSFER_ERROR)
-//             return(RES_ERROR);
-//         else
-// 		{
-// 			SD_print_error(Status);
-//             return(RES_OK);
-// 		}
-//     }
-//     else
-//         return(RES_ERROR);
-
-// 	SD_Error SDError;
-// 	printf("disk_read %d %p %10d %d\n",pdrv,buff,sector,count);
-// 	SDError = SD_ReadMultiBlocksFIXED ( buff, sector, 512, count );
-// 	SD_print_error(SDError);
-// 	return RES_OK;
-
-	
-	
-// 	uint16_t	Transfer_Length;
-// 	uint32_t	Memory_Offset;
-// 	SD_Error	SDStatus;
-// 	
-// 	if( pdrv == SD_DISK_PDRV )
-// 	{
-//         Transfer_Length = count;// * 512;
-//         Memory_Offset = sector;//sector * 512;
-
-// 		printf("disk_read %d %p %10d %d\n",pdrv,buff,sector,count);
-// 		
-//         if (count == 1)
-//             SDStatus = SD_ReadBlock(buff, Memory_Offset, Transfer_Length);
-//         else
-//             SDStatus = SD_ReadMultiBlocks(buff, Memory_Offset, 512, count);
-
-//         if (SDStatus != SD_OK)
-//             return RES_ERROR;
-
-// #ifdef	SD_DMA_MODE
-//         SDStatus = SD_WaitReadOperation();
-//         if (SDStatus != SD_OK)
-//             return RES_ERROR;
-
-//         while (SD_GetStatus() != SD_TRANSFER_OK)
-//             ;
-// #endif
-//         return RES_OK;
-
-// 	}
-// 	return RES_PARERR;
+	printf("disk_read  pdrv=%d *buff=%p sector=%d count=%d\n",pdrv,buff,sector,count);
+	if(count <= 1)
+	{
+		printf("SD_ReadBlock:");
+		SDError = SD_ReadBlock(buff, sector*BLOCK_SIZE, BLOCK_SIZE);
+		SD_print_error(SDError);
+		//printf("SD_WaitReadOperation:");
+		//SDError = SD_WaitReadOperation();
+		//SD_print_error(SDError);
+		while( SD_GetStatus() != SD_TRANSFER_OK );
+		if(SDError != SD_OK)dresult = RES_ERROR;
+	}
+	else
+	{
+		printf("SD_ReadMultiBlocks:");
+		SDError = SD_ReadMultiBlocks(buff, sector*BLOCK_SIZE, BLOCK_SIZE, count);
+		SD_print_error(SDError);
+		//printf("SD_WaitReadOperation:");
+		//SDError = SD_WaitReadOperation();
+		//SD_print_error(SDError);
+		while( SD_GetStatus() != SD_TRANSFER_OK );
+		if(SDError != SD_OK)dresult = RES_ERROR;
+	}
+	return dresult;
 }
 
 

@@ -17,5 +17,6 @@ void SD_print_error( SD_Error SDError );
 SD_Error SD_PrintCardStatus( void );
 SD_Error SD_PrintInfo( void );
 void SD_PrintState( uint8_t SDCardState );
+void print_adr_HEX_str( const uint32_t adr, const uint8_t * Buff );
 
 #endif /* _SDIO_DEBUG_H */

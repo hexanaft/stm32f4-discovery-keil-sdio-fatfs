@@ -51,7 +51,13 @@ FRESULT scan_files (char* path)
 		for (;;) {
 			DEBUG_PRINT(("f_readdir:\n"));
 			res = f_readdir(&dir, &fno);
-			if (res != FR_OK || fno.fname[0] == 0) {FR_print_error(res);break;}
+			if (res != FR_OK || fno.fname[0] == 0) 
+				{
+					#ifdef DEBUG
+					FR_print_error(res);
+					#endif
+					break;
+				}
 			if (fno.fname[0] == '.') continue;
 #if _USE_LFN
 			fn = *fno.lfname ? fno.lfname : fno.fname;
@@ -62,14 +68,25 @@ FRESULT scan_files (char* path)
 				DEBUG_PRINT(("path:%s\n", fn));
 				sprintf(&path[i], "/%s", fn);
 				res = scan_files(path);
-				if (res != FR_OK) {FR_print_error(res);break;}
+				if (res != FR_OK)
+				{
+					#ifdef DEBUG
+					FR_print_error(res);
+					#endif
+					break;
+				}
 				path[i] = 0;
 			} else {
 				printf("%s/%s\n", path, fn);
 			}
 		}
 	}
-	else FR_print_error(res);
+	else 
+	{
+		#ifdef DEBUG
+		FR_print_error(res);
+		#endif
+	}
 
 	return res;
 }

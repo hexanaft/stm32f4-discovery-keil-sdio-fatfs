@@ -242,10 +242,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>18</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>114</CurrentLine>
+      <TopLine>97</TopLine>
+      <CurrentLine>138</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -560,7 +560,7 @@
 
   <Group>
     <GroupName>fatfs</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -602,10 +602,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>7</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>19</TopLine>
-      <CurrentLine>34</CurrentLine>
+      <TopLine>29</TopLine>
+      <CurrentLine>33</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\fatfs\ff_debug.c</PathWithFileName>
       <FilenameWithoutPath>ff_debug.c</FilenameWithoutPath>

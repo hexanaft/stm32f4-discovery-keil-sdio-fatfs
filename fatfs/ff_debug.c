@@ -38,12 +38,17 @@ FRESULT scan_files (char* path)
 	DIR dir;
 	int i;
 	char *fn;
+// #if _USE_LFN
+// 	static char lfn[_MAX_LFN * (_DF1S ? 2 : 1) + 1];
+// 	fno.lfname = lfn;
+// 	fno.lfsize = sizeof(lfn);
+// #endif
 #if _USE_LFN
-	static char lfn[_MAX_LFN * (_DF1S ? 2 : 1) + 1];
-	fno.lfname = lfn;
-	fno.lfsize = sizeof(lfn);
+    static char lfn[_MAX_LFN + 1];
+    fno.lfname = lfn;
+    fno.lfsize = sizeof lfn;
 #endif
-
+	
 	DEBUG_PRINT(("f_opendir:\n"));
 	res = f_opendir(&dir, path);
 	if (res == FR_OK) {
@@ -52,12 +57,12 @@ FRESULT scan_files (char* path)
 			DEBUG_PRINT(("f_readdir:\n"));
 			res = f_readdir(&dir, &fno);
 			if (res != FR_OK || fno.fname[0] == 0) 
-				{
-					#ifdef DEBUG
-					FR_print_error(res);
-					#endif
-					break;
-				}
+			{
+				#ifdef DEBUG
+				FR_print_error(res);
+				#endif
+				break;
+			}
 			if (fno.fname[0] == '.') continue;
 #if _USE_LFN
 			fn = *fno.lfname ? fno.lfname : fno.fname;

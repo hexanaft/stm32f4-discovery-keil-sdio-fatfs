@@ -112,7 +112,8 @@ void print_all_SD( uint32_t size )
 	while(size--)
 	{
 		//printf("k = %i\n",k);
-		SDError = SD_ReadBlock(Buff, ReadAddr, PRINT_BUF_SIZE);
+		//SDError = SD_ReadMultiBlocksFIXED(Buff, ReadAddr, PRINT_BUF_SIZE, 1);
+		SDError = SD_ReadMultiBlocks(Buff, ReadAddr, PRINT_BUF_SIZE, 1);
 		if(SDError != SD_OK )
 			SD_print_error( SDError );
 		
@@ -280,8 +281,8 @@ void SD_test( void )
 	
 	print_RCC_Clocks();
 	printf("SDIOCLK = ((HSE_VALUE / PLL_M) * PLL_N) / PLLQ = %u\n", sdioclk);
-	printf("For init: SDIO_CK = SDIOCLK / (SDIO_INIT_CLK_DIV + 2) = %i\n",(sdioclk/(SDIO_INIT_CLK_DIV + 2)));
-	printf("For transfer: SDIO_CK = SDIOCLK / (SDIO_TRANSFER_CLK_DIV + 2) = %i\n",(sdioclk/(SDIO_TRANSFER_CLK_DIV + 2)));
+//	printf("For init: SDIO_CK = SDIOCLK / (SDIO_INIT_CLK_DIV + 2) = %i\n",(sdioclk/(SDIO_INIT_CLK_DIV + 2)));
+//	printf("For transfer: SDIO_CK = SDIOCLK / (SDIO_TRANSFER_CLK_DIV + 2) = %i\n",(sdioclk/(SDIO_TRANSFER_CLK_DIV + 2)));
 	
 	#ifdef SD_DMA_MODE
 	printf("SD_DMA_MODE\n");

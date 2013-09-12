@@ -29,6 +29,8 @@ void FR_print_error( FRESULT fresult )
 	printf("\t!FRESULT: %d - %s \n", fresult, FRErrorStr[fresult] );
 }
 
+#define _DF1S	0
+
 FRESULT scan_files (char* path)
 {
 	FRESULT res;
@@ -42,12 +44,12 @@ FRESULT scan_files (char* path)
 	fno.lfsize = sizeof(lfn);
 #endif
 
-	printf("f_opendir:\n");
+	DEBUG_PRINT(("f_opendir:\n"));
 	res = f_opendir(&dir, path);
 	if (res == FR_OK) {
 		i = strlen(path);
 		for (;;) {
-			printf("f_readdir:\n");
+			DEBUG_PRINT(("f_readdir:\n"));
 			res = f_readdir(&dir, &fno);
 			if (res != FR_OK || fno.fname[0] == 0) {FR_print_error(res);break;}
 			if (fno.fname[0] == '.') continue;
@@ -57,6 +59,7 @@ FRESULT scan_files (char* path)
 			fn = fno.fname;
 #endif
 			if (fno.fattrib & AM_DIR) {
+				DEBUG_PRINT(("path:%s\n", fn));
 				sprintf(&path[i], "/%s", fn);
 				res = scan_files(path);
 				if (res != FR_OK) {FR_print_error(res);break;}

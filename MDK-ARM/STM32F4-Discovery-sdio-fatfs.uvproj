@@ -471,6 +471,11 @@
               <FileType>1</FileType>
               <FilePath>..\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -492,14 +497,14 @@
               <FilePath>..\sdio\stm32f4_discovery_sdio_sd.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4_discovery_sdio_sd_LowLevel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\sdio\stm32f4_discovery_sdio_sd_LowLevel.c</FilePath>
-            </File>
-            <File>
               <FileName>sdio_debug.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\sdio\sdio_debug.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4_discovery_sdio_sd_LowLevel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\sdio\stm32f4_discovery_sdio_sd_LowLevel.c</FilePath>
             </File>
           </Files>
         </Group>

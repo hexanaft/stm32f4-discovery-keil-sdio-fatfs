@@ -13,12 +13,20 @@
 #include <string.h>		/* for memcpy */
 #include "stm32f4xx.h"
 #include "stm32f4_discovery_sdio_sd.h"
-#include "sdio_debug.h"
+
 
 extern SD_CardInfo SDCardInfo;
 BYTE SDInitialized = 0;
 
 #define SD_DISK_PDRV	0 /* Physical drive number for SD */
+//#define DEBUG
+
+#ifdef DEBUG
+#include "sdio_debug.h"
+# define DEBUG_PRINT(x) printf x
+#else
+# define DEBUG_PRINT(x) do {} while (0)
+#endif
 
 /*-----------------------------------------------------------------------*/
 /* Inidialize a Drive                                                    */
@@ -28,40 +36,44 @@ DSTATUS disk_initialize (
 	BYTE pdrv				/* Physical drive nmuber (0..) */
 )
 {
-	SD_Error			SDError;
-
+	SD_Error	SDError;
+	
 	if( pdrv == SD_DISK_PDRV )
 	{
 		if (SDInitialized == 1)
 		{
-			printf("Allredy configure SD card.\n");
+			DEBUG_PRINT(("Allredy configure SD card.\n"));
 			return 0;	/* All OK */
 		}
 		
-		printf("Configure SD card...\n");
+		DEBUG_PRINT(("Configure SD card...\n"));
 		if ((SDError = SD_Init()) != SD_OK)
 		{
-			printf("Configure SD card - FAILED. SD_Init()\n");
+			DEBUG_PRINT(("Configure SD card - FAILED. SD_Init()\n"));
+			#ifdef DEBUG 
 			SD_print_error( SDError );
+			#endif
 			return STA_NOINIT;
 		}
 		
+		#ifdef DEBUG 
 		if ((SDError = SD_PrintInfo()) != SD_OK)
 		{
-			printf("Configure SD card - FAILED. SD_PrintInfo()\n");
+			DEBUG_PRINT(("Configure SD card - FAILED. SD_PrintInfo()\n"));
 			SD_print_error( SDError );
 			return STA_NOINIT;
 		}
 		
 		if ((SDError = SD_PrintCardStatus()) != SD_OK)
 		{
-			printf("Configure SD card - FAILED. SD_PrintCardStatus()\n");
+			DEBUG_PRINT(("Configure SD card - FAILED. SD_PrintCardStatus()\n"));
 			SD_print_error( SDError );
 			return STA_NOINIT;
 		}
+		#endif
 		
 		SDInitialized = 1;
-		printf("Configure SD card - OK.\n");
+		DEBUG_PRINT(("Configure SD card - OK.\n"));
 		
 		return 0;	/* All OK */
 	}
@@ -121,31 +133,51 @@ DRESULT disk_read (
 //	SDTransferState SD_TransferState;
 	DRESULT dresult = RES_OK;
 	SD_Error SDError;
-	
-	printf("disk_read  pdrv=%d *buff=%p sector=%d count=%d\n",pdrv,buff,sector,count);
-	if(count <= 1)
-	{
-		printf("SD_ReadBlock:");
-		SDError = SD_ReadBlock(buff, sector*BLOCK_SIZE, BLOCK_SIZE);
-		SD_print_error(SDError);
-		//printf("SD_WaitReadOperation:");
-		//SDError = SD_WaitReadOperation();
-		//SD_print_error(SDError);
-		while( SD_GetStatus() != SD_TRANSFER_OK );
-		if(SDError != SD_OK)dresult = RES_ERROR;
+	if( pdrv == SD_DISK_PDRV )
+	{	
+		DEBUG_PRINT(("disk_read  pdrv=%d *buff=%p sector=%d count=%d\n",pdrv,buff,sector,count));
+		if(count <= 1)
+		{
+			DEBUG_PRINT(("SD_ReadBlock:"));
+			SDError = SD_ReadBlock(buff, sector*BLOCK_SIZE, BLOCK_SIZE);
+			#ifdef DEBUG 
+			SD_print_error(SDError);
+			#endif
+			
+			#ifdef SD_DMA_MODE
+			DEBUG_PRINT(("SD_WaitReadOperation:"));
+			SDError = SD_WaitReadOperation();
+			#ifdef DEBUG 
+			SD_print_error(SDError);
+			#endif
+			#endif
+			
+			while( SD_GetStatus() != SD_TRANSFER_OK );
+			if(SDError != SD_OK)dresult = RES_ERROR;
+		}
+		else
+		{
+			DEBUG_PRINT(("SD_ReadMultiBlocks:"));
+			SDError = SD_ReadMultiBlocksFIXED(buff, sector*BLOCK_SIZE, BLOCK_SIZE, count);
+			//SDError = SD_ReadMultiBlocks(buff, sector*BLOCK_SIZE, BLOCK_SIZE, count);
+			#ifdef DEBUG 
+			SD_print_error(SDError);
+			#endif
+			
+			#ifdef SD_DMA_MODE
+			DEBUG_PRINT(("SD_WaitReadOperation:"));
+			SDError = SD_WaitReadOperation();
+			#ifdef DEBUG 
+			SD_print_error(SDError);
+			#endif
+			#endif
+			
+			while( SD_GetStatus() != SD_TRANSFER_OK );
+			if(SDError != SD_OK)dresult = RES_ERROR;
+		}
+		return dresult;
 	}
-	else
-	{
-		printf("SD_ReadMultiBlocks:");
-		SDError = SD_ReadMultiBlocks(buff, sector*BLOCK_SIZE, BLOCK_SIZE, count);
-		SD_print_error(SDError);
-		//printf("SD_WaitReadOperation:");
-		//SDError = SD_WaitReadOperation();
-		//SD_print_error(SDError);
-		while( SD_GetStatus() != SD_TRANSFER_OK );
-		if(SDError != SD_OK)dresult = RES_ERROR;
-	}
-	return dresult;
+	return RES_PARERR;
 }
 
 
@@ -162,9 +194,51 @@ DRESULT disk_write (
 	BYTE count			/* Number of sectors to write (1..128) */
 )
 {
+	DRESULT dresult = RES_OK;
+	SD_Error SDError;
 	if( pdrv == SD_DISK_PDRV )
-	{
-		
+	{	
+		DEBUG_PRINT(("disk_write  pdrv=%d *buff=%p sector=%d count=%d\n",pdrv,buff,sector,count));
+		if(count <= 1)
+		{
+			DEBUG_PRINT(("SD_WriteBlock:"));
+			SDError = SD_WriteBlock((uint8_t*)(buff), sector*BLOCK_SIZE, BLOCK_SIZE);
+			#ifdef DEBUG 
+			SD_print_error(SDError);
+			#endif
+			
+			#ifdef SD_DMA_MODE
+			DEBUG_PRINT(("SD_WaitWriteOperation:"));
+			SDError = SD_WaitWriteOperation();
+			#ifdef DEBUG 
+			SD_print_error(SDError);
+			#endif
+			#endif
+			
+			while( SD_GetStatus() != SD_TRANSFER_OK );
+			if(SDError != SD_OK)dresult = RES_ERROR;
+		}
+		else
+		{
+			DEBUG_PRINT(("SD_ReadMultiBlocks:"));
+			SDError = SD_WriteMultiBlocksFIXED((uint8_t*)(buff), sector*BLOCK_SIZE, BLOCK_SIZE, count);
+			//SDError = SD_WriteMultiBlocks(buff, sector*BLOCK_SIZE, BLOCK_SIZE, count);
+			#ifdef DEBUG 
+			SD_print_error(SDError);
+			#endif
+			
+			#ifdef SD_DMA_MODE
+			DEBUG_PRINT(("SD_WaitWriteOperation:"));
+			SDError = SD_WaitWriteOperation();
+			#ifdef DEBUG 
+			SD_print_error(SDError);
+			#endif
+			#endif
+			
+			while( SD_GetStatus() != SD_TRANSFER_OK );
+			if(SDError != SD_OK)dresult = RES_ERROR;
+		}
+		return dresult;
 	}
 	return RES_PARERR;
 }

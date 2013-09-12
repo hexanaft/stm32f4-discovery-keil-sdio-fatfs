@@ -9,6 +9,15 @@
 #include "stm32f4_discovery_sdio_sd.h"
 #include "ff.h"
 
+//#define DEBUG
+
+#ifdef DEBUG
+#include "sdio_debug.h"
+# define DEBUG_PRINT(x) printf x
+#else
+# define DEBUG_PRINT(x) do {} while (0)
+#endif
+
 void FR_print_error( FRESULT fresult );
 FRESULT scan_files (char* path);
 
